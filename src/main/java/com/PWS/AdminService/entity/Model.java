@@ -1,5 +1,6 @@
 package com.PWS.AdminService.entity;
 
+import com.PWS.AdminService.Utility.AuditModel;
 import com.sun.istack.NotNull;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -8,13 +9,14 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Model {
+public class Model extends AuditModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -23,18 +25,20 @@ public class Model {
     @Column(nullable = false)
     private String name;
 
-    @CreatedDate
-    @Column(nullable = false)
-    private Date createdAt=new Date();
-    @LastModifiedDate
-    @Column(nullable = false)
-    private Date updatedAt=new Date();
+    @ColumnDefault("true")
+    private Boolean isActive=true;
+
+}
+
+//    @CreatedDate
+//    @Column(nullable = false)
+//    private Date createdAt=new Date();
+//    @LastModifiedDate
+//    @Column(nullable = false)
+//    private Date updatedAt=new Date();
 //    @NotNull
 //    private Integer createdBy;
 //    @NotNull
 //    private Integer updatedBy;
 
-@ColumnDefault("true")
-    private Boolean isActive=true;
 
-}

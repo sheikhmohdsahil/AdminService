@@ -1,14 +1,18 @@
 package com.PWS.AdminService.controller;
 
 import com.PWS.AdminService.dto.PermissionDto;
+import com.PWS.AdminService.dto.LoginDto;
+import com.PWS.AdminService.dto.SignUpDto;
 import com.PWS.AdminService.dto.UserRoleRefDto;
 import com.PWS.AdminService.entity.*;
 //import com.PWS.AdminService.sevice.AdminService.AdminService;
+import com.PWS.AdminService.jwtconfig.JwtUtil;
 import com.PWS.AdminService.sevice.AdminService;
-import com.PWS.AdminService.sevice.AdminServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,11 +22,37 @@ import java.util.Optional;
 public class AdminController {
     @Autowired
     private AdminService adminService;
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @PostMapping("/authenticate")
+    public String generateToken(@RequestBody LoginDto loginDto) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(),loginDto.getPassword())
+            );
+        } catch (Exception ex) {
+            throw new Exception("inavalid username/password");
+        }
+        return jwtUtil.generateToken(loginDto.getEmail());
+    }
+
+
+//    @PostMapping
+//   public ResponseEntity createUser (@RequestBody UserDto userDto) {
+//        jwtUserDetailsService.loadUserByUsername(userDto);
+//        return ResponseEntity.ok().build();
+//   }
 
 
     //user
-    @PostMapping("/user")
-    public User addUser(@RequestBody User user) {return adminService.saveUser(user);}
+    @PostMapping("/public/user")
+    public User userSignUp(@RequestBody SignUpDto signupDTO) throws Exception{
+        return adminService.userSignUp(signupDTO);
+
+    }
 
     @PostMapping("/saveUsers")
     public List<User> saveAllUser(@RequestBody List<User> user) {return adminService.saveUsers(user);}
@@ -44,6 +74,8 @@ public class AdminController {
         adminService.updateUser(user);
         return ResponseEntity.ok("Data Saved successfully");
     }
+
+
 
 
 

@@ -1,6 +1,7 @@
 package com.PWS.AdminService.sevice;
 
 import com.PWS.AdminService.dto.PermissionDto;
+import com.PWS.AdminService.dto.SignUpDto;
 import com.PWS.AdminService.dto.UserRoleRefDto;
 import com.PWS.AdminService.entity.*;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,7 @@ import java.util.Optional;
 public interface AdminService {
 
     //user
-    public User saveUser(User user);
+    public User userSignUp(SignUpDto signupDTO) throws Exception;
     Optional<User> findById(Integer id);
     public void updateUser(User user) throws Exception;
     List<User> findAll();

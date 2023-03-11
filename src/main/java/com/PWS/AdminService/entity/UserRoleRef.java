@@ -1,6 +1,7 @@
 package com.PWS.AdminService.entity;
 
 
+import com.PWS.AdminService.Utility.AuditModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,13 +10,14 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class UserRoleRef {
+public class UserRoleRef extends AuditModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -30,11 +32,6 @@ public class UserRoleRef {
     @ColumnDefault("TRUE")
     private Boolean isActive;
 
-    @CreatedDate
-    @Column(nullable = false)
-    private Date createdAt=new Date();
-    @LastModifiedDate
-    @Column(nullable = false)
-    private Date updatedAt=new Date();
+
 
 }

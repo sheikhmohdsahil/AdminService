@@ -1,10 +1,13 @@
 package com.PWS.AdminService.sevice;
 import com.PWS.AdminService.dto.PermissionDto;
+import com.PWS.AdminService.dto.SignUpDto;
 import com.PWS.AdminService.dto.UserRoleRefDto;
 import com.PWS.AdminService.entity.*;
 import com.PWS.AdminService.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -25,9 +28,27 @@ public class AdminServiceImpl implements AdminService{
     private PermissionRepository permissionRepository;
 
 //users
-    public User saveUser(User user) {
-        return userRepository.save(user);
-    }
+@Override
+public User userSignUp(SignUpDto signupDTO) throws Exception {
+    // Check if the password is strong
+
+    Optional<User> optionalUser = userRepository.findUserByEmail(signupDTO.getEmail());
+    if (optionalUser.isPresent())
+        throw new Exception("User Already Exist with Email : " + signupDTO.getEmail());
+    User user = new User();
+    user.setDateOfBirth(signupDTO.getDob());
+    user.setFirstName(signupDTO.getFirstName());
+    user.setIsActive(true);
+    user.setLastName(signupDTO.getLastName());
+    user.setEmail(signupDTO.getEmail());
+    user.setPhoneNumber(signupDTO.getPhoneNumber());
+    PasswordEncoder encoder = new BCryptPasswordEncoder(8);
+    // Set new password
+    user.setPassword(encoder.encode(signupDTO.getPassword()));
+
+    userRepository.save(user);
+    return user;
+}
     @Override
     public Optional <User> findById(Integer id) {
         return userRepository.findById(id);

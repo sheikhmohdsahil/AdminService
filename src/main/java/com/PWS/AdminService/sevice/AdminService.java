@@ -1,8 +1,6 @@
 package com.PWS.AdminService.sevice;
 
-import com.PWS.AdminService.dto.PermissionDto;
-import com.PWS.AdminService.dto.SignUpDto;
-import com.PWS.AdminService.dto.UserRoleRefDto;
+import com.PWS.AdminService.dto.*;
 import com.PWS.AdminService.entity.*;
 import org.springframework.http.ResponseEntity;
 
@@ -12,16 +10,23 @@ import java.util.Optional;
 public interface AdminService {
 
     //user
+    public void userUpdatePassword(UpdatePasswordDto updatePasswordDto) throws Exception;
     public User userSignUp(SignUpDto signupDTO) throws Exception;
     Optional<User> findById(Integer id);
     public void updateUser(User user) throws Exception;
     List<User> findAll();
+
+
     List<User> saveUsers(List<User> user);
     void delete(Integer id);
 
 
+    void updateResetPasswordToken(String token, String email) throws Exception;
 
-    //role
+    public Optional<User> getByResetPasswordToken(String token);
+
+    public void updatePassword(ResetUpdatepassword resetUpdatepassword)throws Exception;
+    //roleUser user, String newPassword, String confirmPassword
     public Role saveRole(Role role);
     Optional<Role> findRoleById(Integer id);
     List<Role> findAllRole();
@@ -69,4 +74,5 @@ public interface AdminService {
     public ResponseEntity<Object> addOrUpdatePermission(PermissionDto permissionDto) throws Exception;
     public void updatePermission(PermissionDto permissionDto) throws Exception;
 
+//    void updatePassword(User user, String password) throws Exception;
 }

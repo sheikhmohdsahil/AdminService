@@ -1,14 +1,6 @@
-#server:
-#  port: 8080
-#  servlet:
-#    context-path: /resource-server
-#
-#  spring:
-#    jpa:
-#      defer-datasource-initialization: true
-#    security:
-#      oauth2:
-#        resourceserver:
-#          jwt:
-#            issuer-uri: http://localhost:8083/auth/realms/baeldung
-#            jwk-set-uri: http://localhost:8083/auth/realms/baeldung/protocol/openid-connect/certs
+spring:
+  mail:
+    host: smtp-relay.sendinblue.com
+    username: sheikhmohdsahil6@gmail.com
+    password: gEkz9hcF6qpwMnNr
+    port: 587

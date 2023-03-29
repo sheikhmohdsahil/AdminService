@@ -28,30 +28,29 @@ public class User extends AuditModel implements UserDetails, Serializable {
     private Integer id;
     @Column(nullable = false)
     private String firstName;
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Column(nullable = false)
     private String lastName;
-
-//    @JsonFormat(pattern = "yyyy/MM/dd")
+     @JsonFormat(pattern = "yyyy/MM/dd")
+    @Column(nullable = false)
     private Date dateOfBirth;
-    @Column(nullable = false, unique = true)
+    @Column(name = "email", length = 100, nullable = false, unique = true)
     private String email;
     @Column(nullable = false)
     private long phoneNumber;
 
     @Column(nullable = false)
+   // @ValidPassword
     private String password;
 
+    @Column(name = "reset_token")
+    private String resetToken;
     private Boolean isActive;
 
-
-//    @Override
-//    public String getUsername() {
-//        return email;
-//    }
-
-//    public String getEmail() {
-//        return email;
-//    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -90,5 +89,9 @@ public class User extends AuditModel implements UserDetails, Serializable {
     @JsonIgnore
     public boolean isEnabled() {
         return true;
+    }
+
+
+    public void setResetPasswordToken(Object o) {
     }
 }

@@ -30,15 +30,6 @@ public class Model extends AuditModel implements Serializable {
 
 }
 
-//    @CreatedDate
-//    @Column(nullable = false)
-//    private Date createdAt=new Date();
-//    @LastModifiedDate
-//    @Column(nullable = false)
-//    private Date updatedAt=new Date();
-//    @NotNull
-//    private Integer createdBy;
-//    @NotNull
-//    private Integer updatedBy;
+
 
 

@@ -1,7 +1,5 @@
 package com.PWS.AdminService.sevice;
-import com.PWS.AdminService.dto.PermissionDto;
-import com.PWS.AdminService.dto.SignUpDto;
-import com.PWS.AdminService.dto.UserRoleRefDto;
+import com.PWS.AdminService.dto.*;
 import com.PWS.AdminService.entity.*;
 import com.PWS.AdminService.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +9,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AdminServiceImpl implements AdminService{
+public class AdminServiceImpl implements AdminService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -27,11 +26,41 @@ public class AdminServiceImpl implements AdminService{
     @Autowired
     private PermissionRepository permissionRepository;
 
-//users
+
+    //users
+
+    @Override
+    public void userUpdatePassword(UpdatePasswordDto updatePasswordDto) throws Exception {
+
+        Optional<User> optionalUser = userRepository.findUserByEmail(updatePasswordDto.getEmail());
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+        User user = null;
+        if (!optionalUser.isPresent()) {
+            throw new Exception("email not found");
+        }
+        user = optionalUser.get();
+        if (encoder.matches(updatePasswordDto.getOldPassword(), user.getPassword())) {
+            if (isStrongPassword(updatePasswordDto.getNewPassword())&&(updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmPassword()))) {
+                if (!updatePasswordDto.getOldPassword().equals(updatePasswordDto.getNewPassword())) {
+                    user.setPassword(encoder.encode(updatePasswordDto.getNewPassword()));
+                    userRepository.save(user);
+                } else {
+                    throw new Exception(" old Password and new Password are same so please change the password");
+                }
+            } else {
+                throw new Exception("Password should be strong or contains special characters");
+            }
+        } else {
+            throw new Exception("please enter your correct old password");
+        }
+    }
+
 @Override
 public User userSignUp(SignUpDto signupDTO) throws Exception {
-    // Check if the password is strong
 
+    if (!isStrongPassword(signupDTO.getPassword())) {
+        throw new Exception("Password is not strong , at least one uppercase letter, one lowercase letter, one digit, and one special character needed");
+    }
     Optional<User> optionalUser = userRepository.findUserByEmail(signupDTO.getEmail());
     if (optionalUser.isPresent())
         throw new Exception("User Already Exist with Email : " + signupDTO.getEmail());
@@ -55,6 +84,58 @@ public User userSignUp(SignUpDto signupDTO) throws Exception {
     }
     @Override
     public void delete(Integer id) {userRepository.deleteById(id);}
+
+    @Override
+    public void updateResetPasswordToken(String token, String email) throws Exception{
+        User optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser==null) {
+            throw new Exception("Could not find any user with the email " + email);
+
+        } else {
+            optionalUser.setResetToken(token);
+            userRepository.save(optionalUser);
+        }
+    }
+
+    @Override
+    public Optional<User> getByResetPasswordToken(String token) {
+        return userRepository.findByResetPasswordToken(token);
+    }
+
+//    @Override
+//    public void updatePassword(User user, String newPassword) throws Exception {
+//
+//    }
+
+    @Override
+    public void updatePassword(ResetUpdatepassword resetUpdatepassword) throws Exception {
+        Optional<User> optionalUser = userRepository.findByResetPasswordToken(resetUpdatepassword.getToken());
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+        User user = null;
+        if (!optionalUser.isPresent()) {
+            throw new Exception("email not found");
+        }
+        user = optionalUser.get();
+        if (!isStrongPassword(resetUpdatepassword.getNewPassword())){
+            throw new Exception("password should be strong");}
+        if (!encoder.matches(resetUpdatepassword.getNewPassword(), user.getPassword())) {
+            if (resetUpdatepassword.getNewPassword().equals(resetUpdatepassword.getConfirmPassword())) {
+                    user.setPassword(encoder.encode(resetUpdatepassword.getNewPassword()));
+                    userRepository.save(user);
+                } else {
+                    throw new Exception("NewPassword and confirmPassword does not same");
+                }
+
+        } else {
+            throw new Exception("old password cannot be your new password");
+        }
+    }
+
+
+
+
+
 
     @Override
     public List<User> saveUsers(List<User> user) {return (List<User>) userRepository.saveAll(user);}
@@ -290,12 +371,14 @@ public User userSignUp(SignUpDto signupDTO) throws Exception {
 //        return ResponseEntity.ok("data Saved successfully");
     }
 
-
-
-
-
-
-
+//    public void updatePassword(User user, String newPassword) {
+//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//        String encodedPassword = passwordEncoder.encode(newPassword);
+//        user.setPassword(encodedPassword);
+//
+//        user.setResetPasswordToken(null);
+//        userRepository.save(user);
+//    }
 
 
     //role
@@ -321,6 +404,35 @@ public User userSignUp(SignUpDto signupDTO) throws Exception {
         }
     }
 
+
+    private boolean isStrongPassword(String password) {
+        boolean hasUppercase = false;
+        boolean hasLowercase = false;
+        boolean hasDigit = false;
+        boolean hasSpecialChar = false;
+
+        // check for at least one uppercase letter, one lowercase letter, one digit, and one special character
+        for (int i = 0; i < password.length(); i++) {
+            char ch = password.charAt(i);
+            if (Character.isUpperCase(ch)) {
+                hasUppercase = true;
+            } else if (Character.isLowerCase(ch)) {
+                hasLowercase = true;
+            } else if (Character.isDigit(ch)) {
+                hasDigit = true;
+            } else if (isSpecialChar(ch)) {
+                hasSpecialChar = true;
+            }
+        }
+
+        // check if password meets all criteria
+        return password.length() >= 8 && hasUppercase && hasLowercase && hasDigit && hasSpecialChar;
+    }
+
+    private boolean isSpecialChar(char ch) {
+        String specialChars = "!@#$%^&*()_-+=[{]};:<>|./?";
+        return specialChars.contains(Character.toString(ch));
+    }
 
 
 }

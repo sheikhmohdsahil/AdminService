@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +31,9 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/admin")
 public class AdminController {
+    Logger log = LoggerFactory.getLogger(AdminController.class);
     @Autowired
     private AdminService adminService;
     @Autowired
@@ -41,7 +45,7 @@ public class AdminController {
     @Autowired
     private AuthenticationManager authenticationManager;
     @Operation(summary = "Authenticating the User")
-    @PostMapping("/authenticate")
+    @PostMapping("/public/authenticate")
     public String generateToken(@RequestBody LoginDto loginDto) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(),loginDto.getPassword())
@@ -113,7 +117,7 @@ public class AdminController {
     @ApiResponse(description = "creating a user")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Successful operation", content = {@Content(mediaType = "application/json", examples = {@ExampleObject(value = SwaggerLogsConstants.USER_SAVED_200_SUCCESSFULL)})}),@ApiResponse(responseCode = "400", description = "Improper Syntax", content = {@Content(mediaType = "application/json", examples = {@ExampleObject(value = SwaggerLogsConstants.USER_SAVE_400_FAILURE)})})})
     @Operation(summary = "Creating a new User")
-    @PostMapping("/user")
+    @PostMapping("/public/user")
     public User userSignUp(@RequestBody SignUpDto signupDTO) throws Exception{
         return adminService.userSignUp(signupDTO);
 
@@ -196,7 +200,7 @@ public class AdminController {
     @DeleteMapping("/private/deleteRole/{id}")
     public ResponseEntity<String> deleteRole(@PathVariable("id") Integer id) {
         adminService.deleteRole(id);
-        return new ResponseEntity<String>("user with '" + id + "' has been deleted ", HttpStatus.OK);
+        return new ResponseEntity<String>("role has been deleted ", HttpStatus.OK);
     }
 
 

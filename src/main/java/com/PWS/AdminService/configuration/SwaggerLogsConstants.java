@@ -182,11 +182,6 @@ public class SwaggerLogsConstants {
          "}";
 
 
-
-
-
-// public static final String USER_ROLE_REF_UPDATED_500_FAILURE ="" ;
-
  public static final String USER_ROLE_REF_DELETED_200_SUCCESSFULL = "UserRoleRef  is deleted";
  public static final String USER_ROLE_REF_DELETED_400_FAILURE = "{\n" +
          "    \"timestamp\": \"2023-03-14T06:53:44.713+00:00\",\n" +
